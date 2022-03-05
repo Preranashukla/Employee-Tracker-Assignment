@@ -10,7 +10,7 @@ const db = mysql.createConnection(
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
     },
-    console.log('Connected to employeetracker_db database.')
+    console.log('Connected to employeetracker_db.')
 );
 
 
@@ -65,7 +65,74 @@ viewAllEmployees = () => {
             });
     }
   
+addEmployee = () => {
+        inquirer.prompt([
+          {
+            type: 'input',
+            name: 'fistname',
+            message: "What is the employee's first name?",
+          
+          },
+          {
+          type: 'input',
+          name: 'lastname',
+          message: "What is the employees last name?"
+        }
+    ])
+    .then (answer => {
+        const params = [answer.firstname, answer.lastname]
 
-    
-  
+        //get the roles from the employee_role table
+        const rolesSql = `SELECT employee_role.id, employee_role.title from employee_role`;
+        db.query(rolesSql, function (err, data) {
+            if (err) throw err;
+
+            const roles= data.map(({ id, title }) => ({ name: title, value: id}));
+
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'role',
+                    message: "What is the new employee's role?",
+                    choices: roles
+                }
+            ])
+            .then(roleChoice => {
+                const role = roleChoice.role;
+                params.push(role);
+
+                const managerSql = `Select * FROM employee`;
+
+                db.query(managerSql, function (err, data) {
+                    if (err) throw err;
+
+                    const managers = data.map (({id, first_name, last_name}) => ({ name: first_name + " "+ last_name, value: id}));
+                    inquirer.prompt([
+                        {
+                        type: 'list',
+                        name: 'manager',
+                        message: "Who is the new employee's manager?",
+                        choices: managers
+                    }
+                ])
+                    .then(managerChoice => {
+                        const manager = managerChoice.manager;
+                        params.push(manager);
+
+                        const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                        VALUES (?, ?, ?, ?)`;
+                        ///need to fix this and find out why first name is coming up as null in values
+                        db.query(sql, params, (err, result) => {
+                            if (err) throw err;
+                            console.log("Success! New employee has been added")
+
+                            mainQuestions();
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
+
 mainQuestions();
