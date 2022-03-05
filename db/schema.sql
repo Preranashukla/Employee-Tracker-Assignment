@@ -14,7 +14,7 @@ title VARCHAR(30) NOT NULL,
 salary DECIMAL,
 department_id INT,
 FOREIGN KEY (department_id)
-REFERENCES deparment(id)
+REFERENCES department(id)
 ON DELETE CASCADE
 );
 

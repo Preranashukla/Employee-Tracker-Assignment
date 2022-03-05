@@ -56,3 +56,16 @@ const mainQuestions = () => {
     });
 }
 
+viewAllEmployees = () => {
+    console.log('Showing all employees...\n'); 
+    db.query("SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, department.department_name AS department, employee_role.salary,CONCAT (manager.first_name, ' ', manager.last_name) AS manager FROM employee  LEFT JOIN employee_role ON employee.role_id = employee_role.id LEFT JOIN department ON employee_role.department_id = department.id LEFT JOIN employee manager ON employee.manager_id = manager.id", function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        mainQuestions();
+            });
+    }
+  
+
+    
+  
+mainQuestions();
