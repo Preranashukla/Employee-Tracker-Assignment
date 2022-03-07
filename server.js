@@ -195,4 +195,13 @@ db.query(employeeSQL, (err, data) => {
     });
 };
 
+//function to view all role types
+viewAllRoles = () => {
+    console.log('Showing all roles...\n');
+    db.query(`SELECT employee_role.id, employee_role.title, department.department_name AS department FROM employee_role INNER JOIN department ON employee_role.department_id = department.id`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        mainQuestions();
+            });
+}
 mainQuestions();
