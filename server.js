@@ -13,7 +13,7 @@ const db = mysql.createConnection(
     console.log('Connected to employeetracker_db.')
 );
 
-
+//inquirer prompt to ask questions about what the user would like to do
 const mainQuestions = () => {
     inquirer.prompt ([
         {
@@ -55,7 +55,7 @@ const mainQuestions = () => {
         }
     });
 }
-
+//funtion to view all employees
 viewAllEmployees = () => {
     console.log('Showing all employees...\n'); 
     db.query("SELECT employee.id, employee.first_name, employee.last_name, employee_role.title, department.department_name AS department, employee_role.salary,CONCAT (manager.first_name, ' ', manager.last_name) AS manager FROM employee  LEFT JOIN employee_role ON employee.role_id = employee_role.id LEFT JOIN department ON employee_role.department_id = department.id LEFT JOIN employee manager ON employee.manager_id = manager.id", function (err, res) {
@@ -64,7 +64,7 @@ viewAllEmployees = () => {
         mainQuestions();
             });
     }
-  
+  //function to add a new employee
 addEmployee = () => {
         inquirer.prompt([
           {
@@ -123,13 +123,71 @@ addEmployee = () => {
                         const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
                         VALUES (?, ?, ?, ?)`;
                         
-                        ///need to fix this and find out why first name is coming up as null in values
                         db.query(sql, params, (err, result) => {
                             if (err) throw err;
                             console.log("Success! New employee has been added")
-
+                            viewAllEmployees();
                             mainQuestions();
                         });
+                    });
+                });
+            });
+        });
+    });
+};
+//function to update employee role
+updateRole = () => {
+const employeeSQL = `SELECT * FROM employee`;
+
+db.query(employeeSQL, (err, data) => {
+    if (err) throw err;
+
+    const employees = data.map(({ id, first_name, last_name}) => ({name: first_name + " " + last_name, value: id}));
+
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'name',
+            message: "Which employee's role would you like to update?",
+            choices: employees
+        }
+    ])
+        .then(chosenEmployee => {
+            const employee = chosenEmployee.name;
+            const params = [];
+            params.push(employee);
+
+            const updateroleSql = `SELECT * FROM employee_role`;
+
+            db.query(updateroleSql, (err, data) => {
+                if (err) throw err
+
+                const roles = data.map(({ id, title}) => ({ name: title, value: id}));
+
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: "What is the employee's new role?",
+                        choices: roles
+                    }
+                ])
+                .then(chosenRole => {
+                    const role = chosenRole.role;
+                    params.push(role);
+
+                    let employee = params[0]
+                    params[0] = role
+                    params[1] = employee
+
+                    const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
+
+                    db.query(sql, params, (err, result) => {
+                        if (err) throw err;
+                        console.log("Employee role has been updated!");
+
+                        viewAllEmployees();
+                        mainQuestions();
                     });
                 });
             });
