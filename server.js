@@ -47,10 +47,10 @@ const mainQuestions = () => {
                 addRole();
                 break;
             case 'View All Departments':
-                ViewAllDepartments();
+                viewAllDepartments();
                 break;
             case 'Add Department':
-                addDeparment();
+                addDepartment();
                 break;
         }
     });
@@ -258,4 +258,36 @@ addRole = () => {
         });
     });
 };
+
+//function to view all departments
+viewAllDepartments = () => {
+    console.log('Showing all departments...\n');
+    db.query(`SELECT department.id AS id, department.department_name AS department FROM department`, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        mainQuestions();
+            });
+}
+
+//function to add a new department
+addDepartment = () => {
+    inquirer.prompt ([
+        {
+            type: 'input',
+            name: 'newDept',
+            message: "What is the name of the new department you would like to add?"
+        }
+    ])
+    .then(answer => {
+        const sql = `INSERT INTO department (department_name)
+        VALUES (?)`;
+
+        db.query(sql, answer.newDept, (err, res) => {
+            if (err) throw err;
+            console.log("Added " + answer.newDept + " to departments")
+            viewAllDepartments();
+            mainQuestions();
+        })
+    })
+}
 mainQuestions();
