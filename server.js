@@ -69,7 +69,7 @@ addEmployee = () => {
         inquirer.prompt([
           {
             type: 'input',
-            name: 'fistname',
+            name: 'firstname',
             message: "What is the employee's first name?",
           
           },
@@ -80,8 +80,9 @@ addEmployee = () => {
         }
     ])
     .then (answer => {
+        console.log(answer.firstname);
         const params = [answer.firstname, answer.lastname]
-
+        //console.log(params)
         //get the roles from the employee_role table
         const rolesSql = `SELECT employee_role.id, employee_role.title from employee_role`;
         db.query(rolesSql, function (err, data) {
@@ -118,9 +119,10 @@ addEmployee = () => {
                     .then(managerChoice => {
                         const manager = managerChoice.manager;
                         params.push(manager);
-
+                       // console.log(params);
                         const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
                         VALUES (?, ?, ?, ?)`;
+                        
                         ///need to fix this and find out why first name is coming up as null in values
                         db.query(sql, params, (err, result) => {
                             if (err) throw err;
