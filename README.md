@@ -73,4 +73,4 @@ The following image shows the terminal while using the add department function:
 
 ## A link to a video walk through of the demo
 
-This link shows a video of the Employee Tracker in action: https://watch.screencastify.com/v/B5oqqDN0gDdrcJrMp27j
+This link shows a video of the Employee Tracker in action: https://drive.google.com/file/d/1e7ovNjn6b6-LZjic3Q9NeacXETktLDQP/view
