@@ -43,7 +43,7 @@ const mainQuestions = () => {
             case 'View All Roles':
                 viewAllRoles();
                 break;
-            case 'Add Roles':
+            case 'Add Role':
                 addRole();
                 break;
             case 'View All Departments':
@@ -204,4 +204,58 @@ viewAllRoles = () => {
         mainQuestions();
             });
 }
+
+//function to add a new role
+addRole = () => {
+    //console.log("GETTING TO ADD ROLE FUNCTION TEST")
+    inquirer.prompt ([
+        {
+            type: 'input',
+            name: 'role',
+            message: "What is the name of the role you like to create?"
+        },
+        {
+            type: 'input',
+            name: 'salary',
+            message: "What is the salary of this new role?"
+        }
+    ])
+    .then(answer => {
+        const params = [answer.role, answer.salary];
+
+        //get user to select which department the role is in from the 
+        //list of deparments in the deparment table
+        const roleSQL = `SELECT department_name, id FROM department`;
+
+        db.query(roleSQL, (err, data) => {
+            if (err) throw err;
+
+            const departments = data.map(({department_name, id}) => ({name: department_name, value: id}));
+
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'dept',
+                    message: "What department is the new role in?",
+                    choices: departments
+                }
+            ])
+            .then(chosenDept => {
+                const dept = chosenDept.dept;
+                //console.log(dept);
+                params.push(dept);
+                //console.log(params);
+                const sql = `INSERT INTO employee_role (title, salary, department_id)
+                VALUES (?, ?, ?)`;
+
+                db.query(sql, params, (err, result) => {
+                    if (err) throw err;
+                    console.log("Added " + answer.role + " to roles!");
+
+                    viewAllRoles();
+                });
+            });
+        });
+    });
+};
 mainQuestions();
