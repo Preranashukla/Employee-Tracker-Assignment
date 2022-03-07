@@ -137,7 +137,6 @@ addEmployee = () => {
                   db.query(sql, params, (err, result) => {
                     if (err) throw err;
                     console.log("Success! New employee has been added");
-                    viewAllEmployees();
                     mainQuestions();
                   });
                 });
@@ -205,7 +204,6 @@ updateRole = () => {
                 if (err) throw err;
                 console.log("Employee role has been updated!");
 
-                viewAllEmployees();
                 mainQuestions();
               });
             });
@@ -279,7 +277,7 @@ addRole = () => {
               if (err) throw err;
               console.log("Added " + answer.role + " to roles!");
 
-              viewAllRoles();
+              mainQuestions();
             });
           });
       });
@@ -317,7 +315,6 @@ addDepartment = () => {
       db.query(sql, answer.newDept, (err, res) => {
         if (err) throw err;
         console.log("Added " + answer.newDept + " to departments");
-        viewAllDepartments();
         mainQuestions();
       });
     });
